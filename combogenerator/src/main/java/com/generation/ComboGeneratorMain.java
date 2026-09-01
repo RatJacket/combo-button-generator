@@ -7,6 +7,7 @@ public class ComboGeneratorMain {
         final String combo = args[0];
         final String imageDirectory = args[1];
         final String outputImageName = args[2];
-        ComboGeneratorApplication.createCombinedComboImage(combo, imageDirectory, outputImageName);
+        final String imageBuffer = args[3];
+        ComboGeneratorApplication.createCombinedComboImage(combo, imageDirectory, outputImageName, Integer.parseInt(imageBuffer));
     }
 }

@@ -14,17 +14,17 @@ import java.util.regex.Pattern;
 
 public class ComboGeneratorApplication {
 
-    private static final int IMAGE_BUFFER = 10;
     public static final String COMBO_PATTERN = "[A-Z][a-z]+(?:\\+[A-Z][a-z]+)?";
 
     public static void createCombinedComboImage(
             final String comboString,
             final String imageDirectory,
-            final String outputImageName) throws IOException {
+            final String outputImageName,
+            final int imageBuffer) throws IOException {
 
         final List<String> comboInputs = parseComboIntoIndividualInputs(comboString);
 
-        final Combo combo = ComboBuilder.buildCombo(comboInputs, imageDirectory);
+        final Combo combo = ComboBuilder.buildCombo(comboInputs, imageDirectory, imageBuffer);
 
         final BufferedImage combinedComboImage = new BufferedImage(combo.totalWidth(), combo.maxHeight(), BufferedImage.TYPE_INT_ARGB);
         final Graphics2D graphics2D = combinedComboImage.createGraphics();
@@ -33,7 +33,7 @@ public class ComboGeneratorApplication {
         for (final BufferedImage comboImage : combo.inputs()) {
             final int centerY = combo.maxHeight() - comboImage.getHeight();
             graphics2D.drawImage(comboImage, currentImagePositionX, centerY / 2, null);
-            currentImagePositionX += comboImage.getWidth() + IMAGE_BUFFER;
+            currentImagePositionX += comboImage.getWidth() + imageBuffer;
         }
 
         graphics2D.dispose();

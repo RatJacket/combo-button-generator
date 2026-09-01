@@ -11,10 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ComboBuilder {
-    private static final int IMAGE_BUFFER = 10;
     public static final String CONTAINS_PLUS_PATTERN = ".*\\+.*";
 
-    public static Combo buildCombo(final List<String> comboInputs, final String imageDirectory) throws IOException {
+    public static Combo buildCombo(final List<String> comboInputs, final String imageDirectory, final int imageBuffer) throws IOException {
         final List<BufferedImage> comboImages = new ArrayList<>();
 
         final BufferedImage plusImage = getImageForSymbolFromResources("Plus");
@@ -29,24 +28,24 @@ public class ComboBuilder {
                 for (final String input : splitCombo) {
                     if (input.equals("+")) {
                         comboImages.add(plusImage);
-                        totalWidth += plusImage.getWidth() + IMAGE_BUFFER;
+                        totalWidth += plusImage.getWidth() + imageBuffer;
                         maxHeight = Math.max(maxHeight, plusImage.getHeight());
                     } else {
                         final BufferedImage comboImage = getImageForInput(imageDirectory, input);
                         comboImages.add(comboImage);
-                        totalWidth += comboImage.getWidth() + IMAGE_BUFFER;
+                        totalWidth += comboImage.getWidth() + imageBuffer;
                         maxHeight = Math.max(maxHeight, comboImage.getHeight());
                     }
                 }
             } else {
                 final BufferedImage comboImage = getImageForInput(imageDirectory, comboInput);
                 comboImages.add(comboImage);
-                totalWidth += comboImage.getWidth() + IMAGE_BUFFER;
+                totalWidth += comboImage.getWidth() + imageBuffer;
                 maxHeight = Math.max(maxHeight, comboImage.getHeight());
             }
             if (!(i == comboInputs.size() - 1)) {
                 comboImages.add(arrowImage);
-                totalWidth += arrowImage.getWidth() + IMAGE_BUFFER;
+                totalWidth += arrowImage.getWidth() + imageBuffer;
             }
         }
         return new Combo(maxHeight, totalWidth, comboImages);
