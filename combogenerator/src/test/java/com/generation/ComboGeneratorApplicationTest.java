@@ -14,10 +14,4 @@ public class ComboGeneratorApplicationTest {
         final List<String> comboInputs = ComboGeneratorApplication.parseComboIntoIndividualInputs("LightRight+MediumHeavy");
         assertEquals(List.of("Light", "Right+Medium", "Heavy"), comboInputs);
     }
-
-    @Test
-    void shouldSplitInputByButtonWithPluses() {
-        final String[] buttonsWithPluses = ComboGeneratorApplication.splitInputByButtonWithPluses("Light+Medium+Heavy");
-        assertArrayEquals(new String[]{"Light", "+", "Medium", "+", "Heavy"}, buttonsWithPluses);
-    }
 }

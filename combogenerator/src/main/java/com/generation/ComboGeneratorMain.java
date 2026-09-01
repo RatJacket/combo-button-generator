@@ -2,7 +2,7 @@ package com.generation;
 
 import java.io.IOException;
 
-public class ComboGenerator {
+public class ComboGeneratorMain {
     public static void main(String[] args) throws IOException {
         final String combo = args[0];
         final String imageDirectory = args[1];
