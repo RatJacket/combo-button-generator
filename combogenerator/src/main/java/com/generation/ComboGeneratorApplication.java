@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 public class ComboGeneratorApplication {
 
     private static final int IMAGE_BUFFER = 10;
+    public static final String COMBO_PATTERN = "[A-Z][a-z]+(?:\\+[A-Z][a-z]+)?";
 
     public static void createCombinedComboImage(
             final String combo,
@@ -30,27 +31,26 @@ public class ComboGeneratorApplication {
         int totalWidth = 0;
         int maxHeight = 0;
         for (int i = 0; i < comboInputs.size(); i++) {
-            String comboInput = comboInputs.get(i);
-            if (comboInput.length() == 1) {
+            final String comboInput = comboInputs.get(i);
+            if (comboInput.matches(".*\\+.*")) {
+                final String[] splitCombo = splitInputByButtonWithPluses(comboInput);
+                for (final String input : splitCombo) {
+                    if (input.equals("+")) {
+                        comboImages.add(plusImage);
+                        totalWidth += plusImage.getWidth() + IMAGE_BUFFER;
+                        maxHeight = Math.max(maxHeight, plusImage.getHeight());
+                    } else {
+                        final BufferedImage comboImage = getImageForInput(imageDirectory, input);
+                        comboImages.add(comboImage);
+                        totalWidth += comboImage.getWidth() + IMAGE_BUFFER;
+                        maxHeight = Math.max(maxHeight, comboImage.getHeight());
+                    }
+                }
+            } else {
                 final BufferedImage comboImage = getImageForInput(imageDirectory, comboInput);
                 comboImages.add(comboImage);
                 totalWidth += comboImage.getWidth() + IMAGE_BUFFER;
                 maxHeight = Math.max(maxHeight, comboImage.getHeight());
-            } else {
-                char[] symbols = comboInput.toCharArray();
-                final BufferedImage comboImage1 = getImageForInput(imageDirectory, String.valueOf(symbols[0]));
-                comboImages.add(comboImage1);
-                totalWidth += comboImage1.getWidth() + IMAGE_BUFFER;
-                maxHeight = Math.max(maxHeight, comboImage1.getHeight());
-
-                comboImages.add(plusImage);
-                totalWidth += plusImage.getWidth() + IMAGE_BUFFER;
-                maxHeight = Math.max(maxHeight, plusImage.getHeight());
-
-                final BufferedImage comboImage2 = getImageForInput(imageDirectory, String.valueOf(symbols[2]));
-                comboImages.add(comboImage2);
-                totalWidth += comboImage2.getWidth() + IMAGE_BUFFER;
-                maxHeight = Math.max(maxHeight, comboImage2.getHeight());
             }
             if (!(i == comboInputs.size() - 1)) {
                 comboImages.add(arrowImage);
@@ -85,11 +85,15 @@ public class ComboGeneratorApplication {
         }
     }
 
+    static String[] splitInputByButtonWithPluses(final String comboInput) {
+        return comboInput.split("(?<=\\+)|(?=\\+)");
+    }
+
     static List<String> parseComboIntoIndividualInputs(final String combo) {
-        Pattern pattern = Pattern.compile(".\\+.|.");
+        Pattern pattern = Pattern.compile(COMBO_PATTERN);
         Matcher matcher = pattern.matcher(combo);
 
-        final List<String> comboInputs = new ArrayList<>();
+        List<String> comboInputs = new ArrayList<>();
         while (matcher.find()) {
             comboInputs.add(matcher.group());
         }
