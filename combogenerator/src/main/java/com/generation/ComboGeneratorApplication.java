@@ -22,6 +22,22 @@ public class ComboGeneratorApplication {
             final String outputImageName,
             final int imageBuffer) throws IOException {
 
+        final BufferedImage combinedComboImage = createCombinedComboImage(comboString, imageDirectory, imageBuffer);
+
+        final File outputDirectory = new File("out");
+        if (!outputDirectory.exists()) {
+            outputDirectory.mkdirs();
+        }
+
+        final String format = outputImageName.substring(outputImageName.lastIndexOf(".") + 1);
+
+        boolean success = ImageIO.write(combinedComboImage, format, new File(outputDirectory, outputImageName));
+        if (!success) {
+            throw new IOException("No appropriate writer found for format: " + format);
+        }
+    }
+
+    static BufferedImage createCombinedComboImage(final String comboString, final String imageDirectory, final int imageBuffer) throws IOException {
         final List<String> comboInputs = parseComboIntoIndividualInputs(comboString);
 
         final Combo combo = ComboBuilder.buildCombo(comboInputs, imageDirectory, imageBuffer);
@@ -37,18 +53,7 @@ public class ComboGeneratorApplication {
         }
 
         graphics2D.dispose();
-
-        final File outputDirectory = new File("out");
-        if (!outputDirectory.exists()) {
-            outputDirectory.mkdirs();
-        }
-
-        final String format = outputImageName.substring(outputImageName.lastIndexOf(".") + 1);
-
-        boolean success = ImageIO.write(combinedComboImage, format, new File(outputDirectory, outputImageName));
-        if (!success) {
-            throw new IOException("No appropriate writer found for format: " + format);
-        }
+        return combinedComboImage;
     }
 
     static List<String> parseComboIntoIndividualInputs(final String combo) {
