@@ -15,11 +15,18 @@ import java.util.Map;
 public class ComboBuilder {
     public static final String CONTAINS_PLUS_PATTERN = ".*\\+.*";
 
-    public static Combo buildCombo(final List<String> comboInputs, final String imageDirectory, final int imageBuffer) throws IOException {
+    public static Combo buildCombo(
+            final List<String> comboInputs,
+            final String imageDirectory,
+            final int imageWidthBuffer,
+            final int imageHeightBuffer,
+            final int maxWidthPerLine) throws IOException {
         final List<BufferedImage> comboImages = new ArrayList<>();
-
         int totalWidth = 0;
-        int maxHeight = 0;
+        int currentLineWidth = 0;
+        int totalHeight = 0;
+        int currentLineHeight = 0;
+        int totalLines = 1;
         final Map<String, BufferedImage> knownImages = new HashMap<>();
         for (int i = 0; i < comboInputs.size(); i++) {
             final String comboInput = comboInputs.get(i);
@@ -29,28 +36,49 @@ public class ComboBuilder {
                     if (input.equals("+")) {
                         final BufferedImage plusImage = getImageForSymbolFromResources("Plus", knownImages);
                         comboImages.add(plusImage);
-                        totalWidth += plusImage.getWidth() + imageBuffer;
-                        maxHeight = Math.max(maxHeight, plusImage.getHeight());
+                        currentLineWidth += plusImage.getWidth() + imageWidthBuffer;
+                        currentLineHeight = Math.max(currentLineHeight, plusImage.getHeight() + imageHeightBuffer);
                     } else {
                         final BufferedImage comboImage = getImageForInput(imageDirectory, input, knownImages);
                         comboImages.add(comboImage);
-                        totalWidth += comboImage.getWidth() + imageBuffer;
-                        maxHeight = Math.max(maxHeight, comboImage.getHeight());
+                        currentLineWidth += comboImage.getWidth() + imageWidthBuffer;
+                        currentLineHeight = Math.max(currentLineHeight, comboImage.getHeight() + imageHeightBuffer);
+                    }
+                }
+                totalWidth = Math.max(totalWidth, currentLineWidth);
+                totalHeight = Math.max(totalHeight, currentLineHeight);
+                if (currentLineWidth > maxWidthPerLine) {
+                    currentLineWidth = 0;
+                    currentLineHeight = totalHeight + currentLineHeight;
+                    if (i != comboInputs.size() - 1) {
+                        totalLines++;
                     }
                 }
             } else {
                 final BufferedImage comboImage = getImageForInput(imageDirectory, comboInput, knownImages);
                 comboImages.add(comboImage);
-                totalWidth += comboImage.getWidth() + imageBuffer;
-                maxHeight = Math.max(maxHeight, comboImage.getHeight());
+                currentLineWidth += comboImage.getWidth() + imageWidthBuffer;
+                currentLineHeight = Math.max(currentLineHeight, comboImage.getHeight() + imageHeightBuffer);
+                totalWidth = Math.max(totalWidth, currentLineWidth);
+                totalHeight = Math.max(totalHeight, currentLineHeight);
+                if (currentLineWidth > maxWidthPerLine) {
+                    currentLineWidth = 0;
+                    currentLineHeight = totalHeight + currentLineHeight;
+                    if (i != comboInputs.size() - 1) {
+                        totalLines++;
+                    }
+                }
             }
-            if (!(i == comboInputs.size() - 1)) {
+            if (i != comboInputs.size() - 1 && currentLineWidth != 0) {
                 final BufferedImage arrowImage = getImageForSymbolFromResources("Arrow", knownImages);
                 comboImages.add(arrowImage);
-                totalWidth += arrowImage.getWidth() + imageBuffer;
+                currentLineWidth += arrowImage.getWidth() + imageWidthBuffer;
+                currentLineHeight = Math.max(currentLineHeight, arrowImage.getHeight() + imageHeightBuffer);
+                totalWidth = Math.max(totalWidth, currentLineWidth);
+                totalHeight = Math.max(totalHeight, currentLineHeight);
             }
         }
-        return new Combo(maxHeight, totalWidth, comboImages);
+        return new Combo(totalWidth, totalHeight, totalLines, comboImages);
     }
 
     private static BufferedImage getImageForInput(final String imageDirectory, final String input, final Map<String, BufferedImage> knownImages) throws IOException {

@@ -16,13 +16,20 @@ public class ComboGeneratorApplication {
 
     public static final String COMBO_PATTERN = "[A-Z][a-z]+(?:\\+[A-Z][a-z]+)?";
 
-    public static void createCombinedComboImage(
+    public static void generateCombinedCombo(
             final String comboString,
             final String imageDirectory,
             final String outputImageName,
-            final int imageBuffer) throws IOException {
+            final int imageWidthBuffer,
+            final int imageHeightBuffer,
+            final int maxWidthPerLine) throws IOException {
 
-        final BufferedImage combinedComboImage = createCombinedComboImage(comboString, imageDirectory, imageBuffer);
+        final BufferedImage combinedComboImage = createCombinedComboBufferedImage(
+                comboString,
+                imageDirectory,
+                imageWidthBuffer,
+                imageHeightBuffer,
+                maxWidthPerLine);
 
         final File outputDirectory = new File("out");
         if (!outputDirectory.exists()) {
@@ -37,19 +44,30 @@ public class ComboGeneratorApplication {
         }
     }
 
-    static BufferedImage createCombinedComboImage(final String comboString, final String imageDirectory, final int imageBuffer) throws IOException {
+    static BufferedImage createCombinedComboBufferedImage(
+            final String comboString,
+            final String imageDirectory,
+            final int imageWidthBuffer,
+            final int imageHeightBuffer,
+            final int maxWidthPerLine) throws IOException {
         final List<String> comboInputs = parseComboIntoIndividualInputs(comboString);
 
-        final Combo combo = ComboBuilder.buildCombo(comboInputs, imageDirectory, imageBuffer);
+        final Combo combo = ComboBuilder.buildCombo(comboInputs, imageDirectory, imageWidthBuffer, imageHeightBuffer, maxWidthPerLine);
 
-        final BufferedImage combinedComboImage = new BufferedImage(combo.totalWidth(), combo.maxHeight(), BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage combinedComboImage = new BufferedImage(combo.maxWidth(), combo.maxHeight(), BufferedImage.TYPE_INT_ARGB);
         final Graphics2D graphics2D = combinedComboImage.createGraphics();
 
         int currentImagePositionX = 0;
+        int lineCount = 0;
         for (final BufferedImage comboImage : combo.inputs()) {
-            final int centerY = combo.maxHeight() - comboImage.getHeight();
-            graphics2D.drawImage(comboImage, currentImagePositionX, centerY / 2, null);
-            currentImagePositionX += comboImage.getWidth() + imageBuffer;
+            if (currentImagePositionX + comboImage.getWidth() + imageWidthBuffer > combo.maxWidth()) {
+                currentImagePositionX = 0;
+                lineCount++;
+            }
+            final int maxHeightPerLine = combo.maxHeight() / combo.totalLines();
+            final int imageCenterY = maxHeightPerLine - comboImage.getHeight();
+            graphics2D.drawImage(comboImage, currentImagePositionX, (imageCenterY / 2) + (lineCount * maxHeightPerLine), null);
+            currentImagePositionX += comboImage.getWidth() + imageWidthBuffer;
         }
 
         graphics2D.dispose();

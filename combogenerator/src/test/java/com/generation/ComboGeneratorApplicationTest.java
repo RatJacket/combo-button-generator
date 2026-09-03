@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,11 +19,13 @@ public class ComboGeneratorApplicationTest {
     }
 
     @Test
-    void shouldCreateCombinedComboImage() throws IOException {
-        final BufferedImage combinedComboImage = ComboGeneratorApplication.createCombinedComboImage(
+    void shouldCreateCombinedComboBufferedImage() throws IOException {
+        final BufferedImage combinedComboImage = ComboGeneratorApplication.createCombinedComboBufferedImage(
                 "UpDownLeftRight+LightMediumHeavy+Assist",
                 "",
-                10);
+                10,
+                10,
+                200);
 
         final BufferedImage expectedComboImage = ImageIO.read(
                 Objects.requireNonNull(this.getClass().getResourceAsStream("/exampleCombo.png")));
