@@ -1,6 +1,7 @@
 package com.generation;
 
 import com.generation.domain.Combo;
+import com.generation.domain.ComboBuilderOptions;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -13,60 +14,38 @@ import java.util.List;
 import java.util.Map;
 
 public class ComboBuilder {
-    public static final String CONTAINS_PLUS_PATTERN = ".*\\+.*";
 
-    public static Combo buildCombo(
-            final List<String> comboInputs,
-            final String imageDirectory,
-            final int imageWidthBuffer,
-            final int imageHeightBuffer,
-            final int maxWidthPerLine) throws IOException {
+    public static Combo buildCombo(final ComboBuilderOptions comboBuilderOptions) throws IOException {
+
+        final List<String> comboInputs = comboBuilderOptions.comboInputs();
+        final int imageWidthBuffer = comboBuilderOptions.imageWidthBuffer();
+        final int imageHeightBuffer = comboBuilderOptions.imageHeightBuffer();
+
         final List<BufferedImage> comboImages = new ArrayList<>();
         int totalWidth = 0;
         int currentLineWidth = 0;
         int totalHeight = 0;
         int currentLineHeight = 0;
         int totalLines = 1;
+
         final Map<String, BufferedImage> knownImages = new HashMap<>();
         for (int i = 0; i < comboInputs.size(); i++) {
-            final String comboInput = comboInputs.get(i);
-            if (comboInput.matches(CONTAINS_PLUS_PATTERN)) {
-                final String[] splitCombo = splitInputByButtonWithPluses(comboInput);
-                for (final String input : splitCombo) {
-                    if (input.equals("+")) {
-                        final BufferedImage plusImage = getImageForSymbolFromResources("Plus", knownImages);
-                        comboImages.add(plusImage);
-                        currentLineWidth += plusImage.getWidth() + imageWidthBuffer;
-                        currentLineHeight = Math.max(currentLineHeight, plusImage.getHeight() + imageHeightBuffer);
-                    } else {
-                        final BufferedImage comboImage = getImageForInput(imageDirectory, input, knownImages);
-                        comboImages.add(comboImage);
-                        currentLineWidth += comboImage.getWidth() + imageWidthBuffer;
-                        currentLineHeight = Math.max(currentLineHeight, comboImage.getHeight() + imageHeightBuffer);
-                    }
-                }
-                totalWidth = Math.max(totalWidth, currentLineWidth);
-                totalHeight = Math.max(totalHeight, currentLineHeight);
-                if (currentLineWidth > maxWidthPerLine) {
-                    currentLineWidth = 0;
-                    currentLineHeight = totalHeight + currentLineHeight;
-                    if (i != comboInputs.size() - 1) {
-                        totalLines++;
-                    }
-                }
-            } else {
-                final BufferedImage comboImage = getImageForInput(imageDirectory, comboInput, knownImages);
+            final String[] splitCombo = splitInputByButtonWithPluses(comboInputs.get(i));
+            for (final String input : splitCombo) {
+                final BufferedImage comboImage = input.equals("+") ?
+                        getImageForSymbolFromResources("Plus", knownImages) :
+                        getImageForInput(comboBuilderOptions.imageDirectory(), input, knownImages);
                 comboImages.add(comboImage);
                 currentLineWidth += comboImage.getWidth() + imageWidthBuffer;
                 currentLineHeight = Math.max(currentLineHeight, comboImage.getHeight() + imageHeightBuffer);
-                totalWidth = Math.max(totalWidth, currentLineWidth);
-                totalHeight = Math.max(totalHeight, currentLineHeight);
-                if (currentLineWidth > maxWidthPerLine) {
-                    currentLineWidth = 0;
-                    currentLineHeight = totalHeight + currentLineHeight;
-                    if (i != comboInputs.size() - 1) {
-                        totalLines++;
-                    }
+            }
+            totalWidth = Math.max(totalWidth, currentLineWidth);
+            totalHeight = Math.max(totalHeight, currentLineHeight);
+            if (currentLineWidth > comboBuilderOptions.maxWidthPerLine()) {
+                currentLineWidth = 0;
+                currentLineHeight = totalHeight + currentLineHeight;
+                if (i != comboInputs.size() - 1) {
+                    totalLines++;
                 }
             }
             if (i != comboInputs.size() - 1 && currentLineWidth != 0) {
@@ -81,7 +60,10 @@ public class ComboBuilder {
         return new Combo(totalWidth, totalHeight, totalLines, comboImages);
     }
 
-    private static BufferedImage getImageForInput(final String imageDirectory, final String input, final Map<String, BufferedImage> knownImages) throws IOException {
+    private static BufferedImage getImageForInput(
+            final String imageDirectory,
+            final String input,
+            final Map<String, BufferedImage> knownImages) throws IOException {
         final BufferedImage knownImage = knownImages.get(input);
         if (knownImage == null) {
             final File imageFile = new File(imageDirectory, input + ".png");
@@ -93,7 +75,9 @@ public class ComboBuilder {
         return knownImage;
     }
 
-    static BufferedImage getImageForSymbolFromResources(final String symbol, final Map<String, BufferedImage> knownImages) throws IOException {
+    static BufferedImage getImageForSymbolFromResources(
+            final String symbol,
+            final Map<String, BufferedImage> knownImages) throws IOException {
         final BufferedImage knownImage = knownImages.get(symbol);
         if (knownImage == null) {
             try (final InputStream inputStream = ComboBuilder.class.getResourceAsStream("/" + symbol + ".png")) {

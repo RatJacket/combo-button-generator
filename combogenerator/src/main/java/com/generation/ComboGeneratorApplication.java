@@ -1,6 +1,7 @@
 package com.generation;
 
 import com.generation.domain.Combo;
+import com.generation.domain.ComboBuilderOptions;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -53,7 +54,7 @@ public class ComboGeneratorApplication {
             final int maxWidthPerLine) throws IOException {
         final List<String> comboInputs = parseComboIntoIndividualInputs(comboString);
 
-        final Combo combo = ComboBuilder.buildCombo(comboInputs, imageDirectory, imageWidthBuffer, imageHeightBuffer, maxWidthPerLine);
+        final Combo combo = ComboBuilder.buildCombo(new ComboBuilderOptions(comboInputs, imageDirectory, imageWidthBuffer, imageHeightBuffer, maxWidthPerLine));
 
         final BufferedImage combinedComboImage = new BufferedImage(combo.maxWidth(), combo.maxHeight(), BufferedImage.TYPE_INT_ARGB);
         final Graphics2D graphics2D = combinedComboImage.createGraphics();
