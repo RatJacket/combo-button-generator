@@ -25,6 +25,9 @@ public class ComboGeneratorUI extends Application {
         final TextField outputFileName = new TextField();
         outputFileName.setPromptText("Enter output file name...");
 
+        final TextField outputDirectory = new TextField();
+        outputDirectory.setPromptText("Enter output directory...");
+
         final Spinner<Integer> imageWidthSpacingBuffer = new Spinner<>(0, 1000, 10);
         imageWidthSpacingBuffer.setPromptText("Enter width spacing buffer for your images...");
 
@@ -42,6 +45,7 @@ public class ComboGeneratorUI extends Application {
                         comboString.getText(),
                         imageDirectory.getText(),
                         outputFileName.getText(),
+                        outputDirectory.getText(),
                         imageWidthSpacingBuffer.getValue(),
                         imageHeightSpacingBuffer.getValue(),
                         maxWidthPerLine.getValue());
@@ -56,6 +60,7 @@ public class ComboGeneratorUI extends Application {
                 comboString,
                 imageDirectory,
                 outputFileName,
+                outputDirectory,
                 imageWidthSpacingBuffer,
                 imageHeightSpacingBuffer,
                 maxWidthPerLine,

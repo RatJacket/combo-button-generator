@@ -20,6 +20,7 @@ public class ComboGeneratorApplication {
             final String comboString,
             final String imageDirectory,
             final String outputImageName,
+            final String outputDirectoryInput,
             final int imageWidthBuffer,
             final int imageHeightBuffer,
             final int maxWidthPerLine) throws IOException {
@@ -31,9 +32,9 @@ public class ComboGeneratorApplication {
                 imageHeightBuffer,
                 maxWidthPerLine);
 
-        final File outputDirectory = new File("out");
+        final File outputDirectory = new File(outputDirectoryInput);
         if (!outputDirectory.exists()) {
-            outputDirectory.mkdirs();
+            final boolean _ = outputDirectory.mkdirs();
         }
 
         final String format = outputImageName.substring(outputImageName.lastIndexOf(".") + 1);
