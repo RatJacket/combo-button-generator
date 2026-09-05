@@ -1,16 +1,19 @@
 package com.generation;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.geometry.Insets;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import static javafx.embed.swing.SwingFXUtils.toFXImage;
 
 public class ComboGeneratorUI extends Application {
 
@@ -29,15 +32,39 @@ public class ComboGeneratorUI extends Application {
         outputDirectory.setPromptText("Enter output directory...");
 
         final Spinner<Integer> imageWidthSpacingBuffer = new Spinner<>(0, 1000, 10);
-        imageWidthSpacingBuffer.setPromptText("Enter width spacing buffer for your images...");
+        imageWidthSpacingBuffer.setPromptText("Enter width spacing buffer (in pixels) for your images...");
 
         final Spinner<Integer> imageHeightSpacingBuffer = new Spinner<>(0, 1000, 10);
-        imageHeightSpacingBuffer.setPromptText("Enter height spacing buffer for your images...");
+        imageHeightSpacingBuffer.setPromptText("Enter height spacing buffer (in pixels) for your images...");
 
-        final Spinner<Integer> maxWidthPerLine = new Spinner<>(0, 2000, 200);
-        maxWidthPerLine.setPromptText("Enter max width per line...");
+        final Spinner<Integer> maxWidthPerLine = new Spinner<>(0, 2000, 500);
+        maxWidthPerLine.setPromptText("Enter max width (in pixels) per line...");
+
+        final Button previewComboButton = new Button("Preview combo");
 
         final Button createComboButton = new Button("Create combo");
+
+        final ImageView comboImageView = new ImageView(
+                toFXImage(
+                        new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB),
+                        null));
+
+
+        previewComboButton.setOnAction(_ -> {
+            try {
+                comboImageView.setImage(toFXImage(
+                        ComboGeneratorApplication.createCombinedComboBufferedImage(
+                                comboString.getText(),
+                                imageDirectory.getText(),
+                                imageWidthSpacingBuffer.getValue(),
+                                imageHeightSpacingBuffer.getValue(),
+                                maxWidthPerLine.getValue()),
+                        null));
+
+            } catch (final IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         createComboButton.setOnAction(_ -> {
             try {
@@ -54,7 +81,7 @@ public class ComboGeneratorUI extends Application {
             }
         });
 
-        VBox layout = new VBox(10);
+        final VBox layout = new VBox(10);
         layout.setPadding(new Insets(15));
         layout.getChildren().addAll(
                 comboString,
@@ -64,9 +91,11 @@ public class ComboGeneratorUI extends Application {
                 imageWidthSpacingBuffer,
                 imageHeightSpacingBuffer,
                 maxWidthPerLine,
-                createComboButton);
+                previewComboButton,
+                createComboButton,
+                comboImageView);
 
-        Scene scene = new Scene(layout, 350, 300);
+        final Scene scene = new Scene(layout, 400, 400);
         stage.setTitle("Combo Generator");
         stage.setScene(scene);
         stage.show();

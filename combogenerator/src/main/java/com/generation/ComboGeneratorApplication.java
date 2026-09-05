@@ -35,7 +35,7 @@ public class ComboGeneratorApplication {
 
         final File outputDirectory = new File(outputDirectoryInput);
         if (!outputDirectory.exists()) {
-            final boolean _ = outputDirectory.mkdirs();
+            throw new IOException("Output directory does not exist!");
         }
 
         final String format = outputImageName.substring(outputImageName.lastIndexOf(".") + 1);
@@ -77,10 +77,10 @@ public class ComboGeneratorApplication {
     }
 
     static List<String> parseComboIntoIndividualInputs(final String combo) {
-        Pattern pattern = Pattern.compile(COMBO_PATTERN);
-        Matcher matcher = pattern.matcher(combo);
+        final Pattern pattern = Pattern.compile(COMBO_PATTERN);
+        final Matcher matcher = pattern.matcher(combo);
 
-        List<String> comboInputs = new ArrayList<>();
+        final List<String> comboInputs = new ArrayList<>();
         while (matcher.find()) {
             comboInputs.add(matcher.group());
         }
