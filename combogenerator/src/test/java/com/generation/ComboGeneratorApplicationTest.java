@@ -1,5 +1,6 @@
 package com.generation;
 
+import com.generation.helpers.ComboGeneratorTestHelpers;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
@@ -30,18 +31,6 @@ public class ComboGeneratorApplicationTest {
         final BufferedImage expectedComboImage = ImageIO.read(
                 Objects.requireNonNull(this.getClass().getResourceAsStream("/exampleCombo.png")));
 
-        final int expectedComboImageWidth = expectedComboImage.getWidth();
-        assertEquals(expectedComboImageWidth, combinedComboImage.getWidth(), "Width mismatch");
-
-        final int expectedComboImageHeight = expectedComboImage.getHeight();
-        assertEquals(expectedComboImageHeight, combinedComboImage.getHeight(), "Height mismatch");
-
-        final int[] expectedPixels = new int[expectedComboImageWidth * expectedComboImageHeight];
-        final int[] actualPixels = new int[expectedComboImageWidth * expectedComboImageHeight];
-
-        expectedComboImage.getRGB(0, 0, expectedComboImageWidth, expectedComboImageHeight, expectedPixels, 0, expectedComboImageWidth);
-        combinedComboImage.getRGB(0, 0, expectedComboImageWidth, expectedComboImageHeight, actualPixels, 0, expectedComboImageWidth);
-
-        assertArrayEquals(expectedPixels, actualPixels, "Pixels do not match");
+        ComboGeneratorTestHelpers.compareBufferedImages(expectedComboImage, combinedComboImage);
     }
 }

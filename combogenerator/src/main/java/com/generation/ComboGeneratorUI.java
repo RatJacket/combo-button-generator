@@ -19,40 +19,41 @@ public class ComboGeneratorUI extends Application {
 
     @Override
     public void start(final Stage stage) {
-        final TextField comboString = new TextField();
-        comboString.setPromptText("Enter combo...");
+        final TextField comboString = createTextFieldWithIdAndPrompt("comboStringTextField", "Enter combo...");
 
-        final TextField imageDirectory = new TextField();
-        imageDirectory.setPromptText("Enter directory of your input images...");
+        final TextField imageDirectory = createTextFieldWithIdAndPrompt("imageDirectoryTextField", "Enter directory of your input images...");
 
-        final TextField outputFileName = new TextField();
-        outputFileName.setPromptText("Enter output file name...");
+        final TextField outputFileName = createTextFieldWithIdAndPrompt("outputFileNameTextField", "Enter output file name...");
 
-        final TextField outputDirectory = new TextField();
-        outputDirectory.setPromptText("Enter output directory...");
+        final TextField outputDirectory = createTextFieldWithIdAndPrompt("outputDirectoryTextField", "Enter output directory...");
 
         final Spinner<Integer> imageWidthSpacingBuffer = new Spinner<>(0, 1000, 10);
+        imageWidthSpacingBuffer.setId("imageWidthSpacingBufferSpinner");
         imageWidthSpacingBuffer.setPromptText("Enter width spacing buffer (in pixels) for your images...");
 
         final Spinner<Integer> imageHeightSpacingBuffer = new Spinner<>(0, 1000, 10);
+        imageHeightSpacingBuffer.setId("imageHeightSpacingBufferSpinner");
         imageHeightSpacingBuffer.setPromptText("Enter height spacing buffer (in pixels) for your images...");
 
         final Spinner<Integer> maxWidthPerLine = new Spinner<>(0, 2000, 500);
+        maxWidthPerLine.setId("maxWidthPerLineSpinner");
         maxWidthPerLine.setPromptText("Enter max width (in pixels) per line...");
 
         final Button previewComboButton = new Button("Preview combo");
+        previewComboButton.setId("previewComboButton");
 
         final Button createComboButton = new Button("Create combo");
+        createComboButton.setId("createComboButton");
 
-        final ImageView comboImageView = new ImageView(
+        final ImageView previewComboImageView = new ImageView(
                 toFXImage(
                         new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB),
                         null));
-
+        previewComboImageView.setId("previewComboImageView");
 
         previewComboButton.setOnAction(_ -> {
             try {
-                comboImageView.setImage(toFXImage(
+                previewComboImageView.setImage(toFXImage(
                         ComboGeneratorApplication.createCombinedComboBufferedImage(
                                 comboString.getText(),
                                 imageDirectory.getText(),
@@ -93,11 +94,18 @@ public class ComboGeneratorUI extends Application {
                 maxWidthPerLine,
                 previewComboButton,
                 createComboButton,
-                comboImageView);
+                previewComboImageView);
 
-        final Scene scene = new Scene(layout, 400, 400);
+        Scene scene = new Scene(layout, 400, 400);
         stage.setTitle("Combo Generator");
         stage.setScene(scene);
         stage.show();
+    }
+
+    private static TextField createTextFieldWithIdAndPrompt(final String id, final String promptText) {
+        final TextField comboString = new TextField();
+        comboString.setId(id);
+        comboString.setPromptText(promptText);
+        return comboString;
     }
 }
