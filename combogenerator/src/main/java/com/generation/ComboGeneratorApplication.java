@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 public class ComboGeneratorApplication {
 
-    public static final String COMBO_PATTERN = "[A-Z][a-z]+(?:\\+[A-Z][a-z]+)?";
+    public static final String COMBO_PATTERN = "[A-Z][a-z]+(?:[.+][A-Z][a-z]+)*";
 
     public static void generateCombinedCombo(
             final String comboString,

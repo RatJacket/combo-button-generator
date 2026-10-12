@@ -30,11 +30,12 @@ public class ComboBuilder {
 
         final Map<String, BufferedImage> knownImages = new HashMap<>();
         for (int i = 0; i < comboInputs.size(); i++) {
-            final String[] splitCombo = splitInputByButtonWithPluses(comboInputs.get(i));
+            final String[] splitCombo = splitInputByButtonWithSpecialSymbols(comboInputs.get(i));
             for (final String input : splitCombo) {
-                final BufferedImage comboImage = input.equals("+") ?
-                        getImageForSymbolFromResources("Plus", knownImages) :
-                        getImageForInput(comboBuilderOptions.imageDirectory(), input, knownImages);
+                final BufferedImage comboImage;
+                if (input.equals("+")) comboImage = getImageForSymbolFromResources("Plus", knownImages);
+                else if (input.equals(".")) continue;
+                else comboImage = getImageForInput(comboBuilderOptions.imageDirectory(), input, knownImages);
                 comboImages.add(comboImage);
                 currentLineWidth += comboImage.getWidth() + imageWidthBuffer;
                 currentLineHeight = Math.max(currentLineHeight, comboImage.getHeight() + imageHeightBuffer);
@@ -90,7 +91,7 @@ public class ComboBuilder {
         return knownImage;
     }
 
-    static String[] splitInputByButtonWithPluses(final String comboInput) {
-        return comboInput.split("(?<=\\+)|(?=\\+)");
+    static String[] splitInputByButtonWithSpecialSymbols(final String comboInput) {
+        return comboInput.split("(?<=[+.])|(?=[+.])");
     }
 }
